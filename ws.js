@@ -82,7 +82,6 @@ var webSocketManager = {
                     }, 1000);
                 };
                 this._socket.onerror = function(error) {
-                    console.log(error);
                 }
             } catch (error) {
                 console.log("[error]: connect to sokcet error");
@@ -112,63 +111,12 @@ window.addEventListener("load",function(){
         //canvasObj.push(emg);
         canvasManager.registerEmgCanvas("ch"+i, emg);
     }
-//    var ch1 = document.getElementById("ch1");
-//    var ch2 = document.getElementById("ch2");
-//    var ch3 = document.getElementById("ch3");
-//    var ch4 = document.getElementById("ch4");
-//    var ch5 = document.getElementById("ch5");
-//    var ch6 = document.getElementById("ch6");
-//    var ch7 = document.getElementById("ch7");
-//    var ch8 = document.getElementById("ch8");
-//    var ctx1 = ch1.getContext("2d");
-//    var ctx2 = ch2.getContext("2d");
-   // ctx1.moveTo(0, 0);
-   // ctx1.lineTo(10,30);
-   // ctx1.lineTo(20, 10);
-   // ctx1.lineTo(30,50);
-   // ctx1.lineTo(40, 30);
-   // for(let i = 0; i< 50; i++) {
-   //     ctx1.lineTo(i*10, i*6);
-   // }
-   // ctx1.stroke();
-   // setTimeout(() => {
-   //     ctx1.clearRect(0, 0, 500, 300);
-   // }, 2000);
-//    var emg1 = Object.create(emgCanvas);
-//    emg1.initEmgCanvas(ctx1);
-//    emg1._setXspacing(10);
-//    emg1._setY(0, 300);
-//    var initValue = 2;
     setInterval(function(){
-        //for(let i = 0; i< canvasObj.length; i++) {
-            //canvasObj[i].pushValue(Math.floor(Math.random() * 300));
             canvasManager.pushEmgData();
-        //}
-        //emg1.pushValue(Math.floor(Math.random() * 300));
     },200);
- //   setInterval(() => {
- //       emg1._context.clearRect(0, 0, 500, 300);
- //   }, 500);
     setInterval(() => {
-        //console.log(emg1._container.length);
-        //emg1._context.clearRect(0, 0, 500, 300);
-        //console.log("draw canvas");
-        //emg1.draw();
-      //  for(let i =0; i< canvasObj.length; i++) {
-      //      canvasObj[i].draw();
-      //  }
       canvasManager.updateCanvas();
     }, 200);
     let ws = Object.create(webSocketManager);
     ws.initWebSocket();
-   // let socket = new WebSocket("ws://127.0.0.1:8876");
-   // socket.onopen = function(e) {
-   //     console.log("socket is opne");
-   // };
-   // socket.onmessage = function(event) {
-   //     console.log(event);
-   // };
-   // socket.onclose = function(event) {
-   //     //alert("socket is closed");
-   // }
 });
