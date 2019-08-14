@@ -2,8 +2,8 @@ var emgCanvas = {
     initEmgCanvas: function(context) {
         this._setContext(context);
         this._xCount = 100;
-        this._xLength = 500;
-        this._yLength = 300;
+        this._width = context.canvas.wdith;
+        this._height = context.canvas.height;
         this._initContainer();
     },
     _setXspacing: function(spacing) {
@@ -17,7 +17,7 @@ var emgCanvas = {
         this._context = context;
     },
     _initContainer : function() {
-        this._container = new Array(this._xCount);
+        this._container = new Array(this._xCount+1);
         for(let i =0; i<this._container.length; i++) {
             this._container[i] = 0;
         }
@@ -27,10 +27,9 @@ var emgCanvas = {
         this._container.push(value);
     },
     draw: function() {
-        //this._context.clearRect(0, 0, this._xLength, this._yLength);
-        this._context.clearRect(0, 0, 500, 300);
-        let xStep = this._xLength / this._xCount;
-        let yStartPoint = (this._container[0] - this._yStart) /(this._yEnd - this._yStart) * this._yLength;
+        this._context.clearRect(0, 0, this._width, this._height);
+        let xStep = this._width / this._xCount;
+        let yStartPoint = (this._container[0] - this._yStart) /(this._yEnd - this._yStart) * this._height;
         this._context.beginPath();
         this._context.fillStyle = 'green';
         this._context.moveTo(0, yStartPoint);
@@ -52,9 +51,9 @@ var canvasManager = {
             this._canvasContainer[key].draw();
         }
     },
-    pushEmgData: function() {
+    pushEmgData: function(emgJson) {
         for(key in this._canvasContainer) {
-           this._canvasContainer[key].pushValue(Math.floor(Math.random() * 300)); 
+            this._canvasContainer[key].pushValue(parseInt(emgJson[key]));
         }
     }
 };
@@ -69,10 +68,24 @@ var webSocketManager = {
                 var self = this;
                 this._socket = new WebSocket("ws://127.0.0.1:8876");
                 this._socket.onopen = function(e) {
+                    console.log("socket is connected");
                     globalContent.wsObj = self;
                 };
                 this._socket.onmessage = function(event) {
-                    console.log(event);
+/* { version: "1.0",
+           type: "emg",
+           ch1Average: "1512",
+           ch1Value: "1513",
+           ch1Powser: "1",
+           ch1Strength: "0",
+           ch2Average: "1506",
+           ch2Value: "1506",
+           ch2Power: "1",
+           ch2Strength: "0" } */
+                    if(!event.data)
+                        return;
+                    let emgJson = JSON.parse(event.data);
+                    canvasManager.pushEmgData(emgJson);
                 };
                 this._socket.onclose = function(event) {
                     console.log("[info]: socket is closed")
@@ -95,28 +108,28 @@ var webSocketManager = {
 
 var globalContent = {};
 window.addEventListener("load",function(){
-    let chArray = [];
-    let ctxArray = [];
-    let canvasObj = [];
-    for(let i = 1; i<=8; i++) {
-        let str = "ch" + i;
-        chArray.push(document.getElementById(str));
+    let array1 = ["ch1Average","ch1Value","ch2Average","ch2Value"];
+    let array2 = ["ch1Power","ch1Strength","ch2Power","ch2Strength"];
+    for(let i = 0; i<array1.length; i++) {
+        let ctx = document.getElementById(array1[i]).getContext("2d");
+        let emgObj = Object.create(emgCanvas);
+        emgObj.initEmgCanvas(ctx);
+        emgObj._setXspacing(10);
+        emgObj._setY(1500, 1600);
+        canvasManager.registerEmgCanvas(array1[i], emgObj);
     }
-    for(let i = 1; i<=8; i++) {
-        ctxArray.push(chArray[i-1].getContext("2d"));
-        let emg = Object.create(emgCanvas);
-        emg.initEmgCanvas(ctxArray[i-1]);
-        emg._setXspacing(10);
-        emg._setY(0,300);
-        //canvasObj.push(emg);
-        canvasManager.registerEmgCanvas("ch"+i, emg);
+    for(let i=0; i< array2.length; i++) {
+        let ctx = document.getElementById(array2[i]).getContext("2d");
+        let emgObj = Object.create(emgCanvas);
+        emgObj.initEmgCanvas(ctx);
+        emgObj._setXspacing(10);
+        emgObj._setY(0, 300);
+        canvasManager.registerEmgCanvas(array2[i], emgObj);
     }
-    setInterval(function(){
-            canvasManager.pushEmgData();
-    },200);
+
     setInterval(() => {
       canvasManager.updateCanvas();
-    }, 200);
+    }, 50);
     let ws = Object.create(webSocketManager);
     ws.initWebSocket();
 });
