@@ -29,12 +29,12 @@ var emgCanvas = {
     draw: function() {
         this._context.clearRect(0, 0, this._width, this._height);
         let xStep = this._width / this._xCount;
-        let yStartPoint = (this._container[0] - this._yStart) /(this._yEnd - this._yStart) * this._height;
+        let yStartPoint = this._height - (this._container[0] - this._yStart) /(this._yEnd - this._yStart) * this._height;
         this._context.beginPath();
         this._context.strokeStyle = "blue";
         this._context.moveTo(0, yStartPoint);
         for(let i = 1; i < this._container.length; i++) {
-            let yPoint = (this._container[i] - this._yStart) / (this._yEnd - this._yStart) * 300;
+            let yPoint = this._height - (this._container[i] - this._yStart) / (this._yEnd - this._yStart) * 300;
             this._context.lineTo(i*xStep, yPoint);
         }
         this._context.stroke();
