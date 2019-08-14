@@ -2,7 +2,7 @@ var emgCanvas = {
     initEmgCanvas: function(context) {
         this._setContext(context);
         this._xCount = 100;
-        this._width = context.canvas.wdith;
+        this._width = context.canvas.width;
         this._height = context.canvas.height;
         this._initContainer();
     },
@@ -31,7 +31,7 @@ var emgCanvas = {
         let xStep = this._width / this._xCount;
         let yStartPoint = (this._container[0] - this._yStart) /(this._yEnd - this._yStart) * this._height;
         this._context.beginPath();
-        this._context.fillStyle = 'green';
+        this._context.strokeStyle = "blue";
         this._context.moveTo(0, yStartPoint);
         for(let i = 1; i < this._container.length; i++) {
             let yPoint = (this._container[i] - this._yStart) / (this._yEnd - this._yStart) * 300;
@@ -85,6 +85,7 @@ var webSocketManager = {
                     if(!event.data)
                         return;
                     let emgJson = JSON.parse(event.data);
+                    //console.log(emgJson);
                     canvasManager.pushEmgData(emgJson);
                 };
                 this._socket.onclose = function(event) {
